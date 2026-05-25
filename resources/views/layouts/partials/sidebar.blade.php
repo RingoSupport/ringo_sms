@@ -2,7 +2,7 @@
 
     <div class="flex h-16 items-center border-b border-slate-200 px-6">
         <h1 class="text-lg font-semibold text-slate-800">
-            RingoSMS Portal
+            Mobifin SMS 
         </h1>
     </div>
 
