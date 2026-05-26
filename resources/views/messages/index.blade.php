@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="space-y-6">
+    <div class="space-y-6 overflow-x-hidden">
 
         <x-ui.page-header
             title="Messages"
@@ -29,11 +29,11 @@
         <div class="space-y-2">
 
             <div class="text-sm font-medium text-slate-500">
-                Submitted Today
+                Derlivered Today
             </div>
 
             <div class="text-3xl font-bold text-emerald-600">
-                {{ number_format($submittedToday) }}
+                {{ number_format($deliveredToday) }}
             </div>
 
         </div>
@@ -78,7 +78,7 @@
 
             <form method="GET"
                   action="{{ route('messages.index') }}"
-                 class="grid grid-cols-1 gap-4 lg:grid-cols-7">
+                 class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
 
                 <div>
 
@@ -107,16 +107,20 @@
                         class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
                     >
 
-                        <option value="">
+                       <option value="">
                             All Statuses
                         </option>
 
-                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>
-                            Successful
+                        <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>
+                            Delivered
                         </option>
 
-                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>
-                            Failed / Pending
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>
+                            Pending
+                        </option>
+
+                        <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>
+                            Failed
                         </option>
 
                     </select>
@@ -166,13 +170,27 @@
         Sender ID
     </label>
 
-    <input
-        type="text"
-        name="senderid"
-        value="{{ request('senderid') }}"
-        placeholder="Sender ID"
-        class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
-    >
+    <select
+    name="senderid"
+    class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
+>
+
+    <option value="">
+        All Sender IDs
+    </option>
+
+    @foreach ($senderIds as $senderId)
+
+        <option
+            value="{{ $senderId }}"
+            {{ request('senderid') === $senderId ? 'selected' : '' }}
+        >
+            {{ $senderId }}
+        </option>
+
+    @endforeach
+
+</select>
 
 </div>
 
@@ -206,6 +224,37 @@
 
                     </div>
 
+                    <div>
+
+    <label class="mb-1 block text-sm font-medium text-slate-700">
+        Per Page
+    </label>
+
+    <select
+        name="per_page"
+        class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
+    >
+
+        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>
+            10
+        </option>
+
+        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>
+            25
+        </option>
+
+        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>
+            50
+        </option>
+
+        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>
+            100
+        </option>
+
+    </select>
+
+</div>
+
                 <div class="flex items-end">
 
                             <button
@@ -225,7 +274,7 @@
 
             <div class="overflow-x-auto">
 
-                <table class="min-w-full divide-y divide-slate-200">
+                <table class="w-full divide-y divide-slate-200">
 
                     <thead class="bg-slate-50">
 
@@ -253,10 +302,6 @@
 
                             <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Status
-                            </th>
-
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                DLR Status
                             </th>
 
                             <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -295,7 +340,7 @@
 
                                 <td class="px-6 py-3 text-sm text-slate-700">
 
-                                <div class="max-w-xs truncate">
+                                <div class="max-w-[220px] truncate">
                                     {{ $message->text }}
                                 </div>
 
@@ -309,31 +354,17 @@
                                     {{ $message->network ?: '—' }}
                                 </td>
 
-                              <td class="px-6 py-3 text-sm">
 
-    @php
+<td class="px-6 py-3 text-sm">
 
-        $dlrStatus = strtolower($message->dlr_status ?? '');
+    <x-ui.badge :color="$message->delivery_color">
 
-    @endphp
+        {{ $message->delivery_state }}
 
-    <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold
-
-        {{ str_contains($dlrStatus, 'deliver')
-            ? 'bg-emerald-100 text-emerald-700'
-            : (str_contains($dlrStatus, 'fail')
-                ? 'bg-rose-100 text-rose-700'
-                : 'bg-amber-100 text-amber-700') }}">
-
-        {{ $message->dlr_status ?: 'Pending' }}
-
-    </span>
+    </x-ui.badge>
 
 </td>
 
-                                <td class="px-6 py-3 text-sm text-slate-700">
-                                    {{ $message->dlr_status ?: '—' }}
-                                </td>
 
                                 <td class="px-6 py-3 text-sm text-slate-700">
                                    <div class="space-y-1">

@@ -28,25 +28,23 @@
         <x-ui.card>
 
     <div class="flex items-center justify-between">
+<div>
 
-        <div>
+    <div class="text-sm font-medium text-slate-500">
+        Delivery Status
+    </div>
 
-            <div class="text-sm font-medium text-slate-500">
-                Submission Status
-            </div>
+    <div class="mt-2">
 
-            <div class="mt-1 text-2xl font-bold
-                {{ $message->status === '1'
-                    ? 'text-emerald-600'
-                    : 'text-amber-600' }}">
+        <x-ui.badge :color="$message->delivery_color">
 
-                {{ $message->status === '1'
-                    ? 'Submitted'
-                    : 'Pending' }}
+            {{ $message->delivery_state }}
 
-            </div>
+        </x-ui.badge>
 
-        </div>
+    </div>
+
+</div>
 
         <div class="text-right">
 
@@ -118,40 +116,8 @@
 
                     </div>
 
-                    <div>
 
-                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Status
-                        </div>
 
-                        <div class="mt-1">
-
-                            <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold
-                                {{ $message->status === '1'
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700' }}">
-
-                                {{ $message->status === '1'
-                                    ? 'Successful'
-                                    : 'Pending / Failed' }}
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                    <div>
-
-                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            DLR Status
-                        </div>
-
-                        <div class="mt-1 text-sm text-slate-900">
-                            {{ $message->dlr_status ?: '—' }}
-                        </div>
-
-                    </div>
 
                     <div>
 
@@ -180,20 +146,8 @@
                         </div>
 
                         <div class="mt-2 rounded-lg bg-slate-50 p-4 text-sm text-slate-700">
-                            {{ $message->text ?: '—' }}
-                        </div>
-
-                    </div>
-
-                    <div>
-
-                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Vendor Response
-                        </div>
-
-                        <div class="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100">
-                            <pre class="whitespace-pre-wrap break-words">
-                            {{ $message->response ?: 'No response available.' }}
+                            <pre class="whitespace-pre-wrap text-sm text-slate-700">
+                            {{ $message->text }}
                             </pre>
                         </div>
 
@@ -201,27 +155,31 @@
 
                     <div>
 
-                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            DLR Request
+                        <div class="text-xs   font-semibold uppercase tracking-wide text-slate-500">
+                           Gateway Reference
                         </div>
 
-                        <div class="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100">
-                            <pre class="whitespace-pre-wrap break-words">{{ $message->dlr_request ?: 'No DLR request available.' }}</pre>
-                        </div>
-
-                    </div>
-
-                    <div>
-
-                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            DLR Results
-                        </div>
-
-                        <div class="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100">
-                            <pre class="whitespace-pre-wrap break-words">{{ $message->dlr_results ?: 'No DLR results available.' }}</pre>
+                        <div class="mt-2 overflow-x-auto font-mono rounded-lg bg-slate-900 p-4 text-xs text-slate-100 ">
+                            <pre class="whitespace-pre-wrap break-words">
+                            {{ $message->response ?: 'No response available.' }}
+                            </pre>
                         </div>
 
                     </div>
+
+                  <div>
+
+    <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Carrier Code
+    </div>
+
+    <div class="mt-1 text-sm text-slate-900">
+        {{ $message->dlr_request ?: '—' }}
+    </div>
+
+</div>
+
+
 
                 </div>
 

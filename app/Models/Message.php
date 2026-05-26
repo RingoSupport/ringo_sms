@@ -51,4 +51,55 @@ public function scopeForClient($query, $clientId)
 {
     return $query->where('client_id', $clientId);
 }
+
+public function getDeliveryStateAttribute(): string
+{
+    return match (strtoupper($this->dlr_status ?? '')) {
+
+        'DELIVRD' => 'Delivered',
+
+        'EXPIRD' => 'Expired',
+
+        '' => 'Pending',
+
+        default => 'Unknown',
+    };
+}
+public function getDeliveryColorAttribute(): string
+{
+    return match (strtoupper($this->dlr_status ?? '')) {
+
+        'DELIVRD' => 'green',
+
+        'EXPIRD' => 'red',
+
+        '' => 'yellow',
+
+        default => 'gray',
+    };
+}
+
+public function getSubmissionStateAttribute(): string
+{
+    return match ((string) $this->status) {
+
+        '1' => 'Submitted',
+
+        '0' => 'Queued',
+
+        default => 'Unknown',
+    };
+}
+
+public function getSubmissionColorAttribute(): string
+{
+    return match ((string) $this->status) {
+
+        '1' => 'green',
+
+        '0' => 'yellow',
+
+        default => 'gray',
+    };
+}
 }

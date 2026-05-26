@@ -17,86 +17,126 @@ class MessageController extends Controller
     ->where('created_at', '<=', date('Y-m-d 23:59:59'))
     ->count();
 
-$submittedToday = Message::query()
-     ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-      ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->where('status', '1')
+$deliveredToday = Message::query()
+    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
+    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
+    ->where('dlr_status', 'DELIVRD')
     ->count();
 
 $pendingToday = Message::query()
     ->where('created_at', '>=', date('Y-m-d 00:00:00'))
     ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->where('status', '0')
+  ->where(function ($query) {
+
+        $query->where('dlr_status', '0')
+              ->orWhere('dlr_status', 'PEND');
+
+    })
     ->count();
 
 $failedToday = Message::query()
     ->where('created_at', '>=', date('Y-m-d 00:00:00'))
     ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->where('status', '2')
+    ->whereIn('dlr_status', [
+        'EXPIRD',
+        'FAILED',
+        'UNDELIV',
+    ])
+
     ->count();
-        $messages = $messages = Message::query()
+     $senderIds = Message::query()
+        ->select('senderid')
+        ->distinct()
+        ->whereNotNull('senderid')
+        ->orderBy('senderid')
+        ->pluck('senderid');
 
-            ->when($request->search, function ($query, $search) {
+    $perPage = $request->per_page ?? 10;
 
-                $query->where(function ($q) use ($search) {
+    $messages = Message::query()
 
-                    $q->where('id', 'like', "%{$search}%")
-                        ->orWhere('msisdn', 'like', "%{$search}%")
-                        ->orWhere('senderid', 'like', "%{$search}%");
+        ->when($request->search, function ($query, $search) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('id', 'like', "%{$search}%")
+                    ->orWhere('msisdn', 'like', "%{$search}%");
+
+            });
+
+        })
+
+        ->when($request->status, function ($query, $status) {
+
+            if ($status === 'delivered') {
+
+                $query->where('dlr_status', 'DELIVRD');
+
+            }
+
+            if ($status === 'pending') {
+
+                $query->where(function ($q) {
+
+                    $q->where('dlr_status', '0')
+                      ->orWhere('dlr_status', 'PEND');
 
                 });
 
-            })
+            }
 
-            ->when($request->status, function ($query, $status) {
+            if ($status === 'failed') {
 
-                $query->where('status', $status);
+                $query->whereIn('dlr_status', [
+                    'EXPIRD',
+                    'FAILED',
+                    'UNDELIV',
+                ]);
 
-            })
+            }
 
-            ->when($request->network, function ($query, $network) {
+        })
 
-                $query->where('network', $network);
+        ->when($request->network, function ($query, $network) {
 
-            })
-            ->when($request->start_date, function ($query, $startDate) {
+            $query->where('network', $network);
 
-    $query->whereDate('created_at', '>=', $startDate);
+        })
 
-})
+        ->when($request->senderid, function ($query, $senderId) {
 
-->when($request->senderid, function ($query, $senderId) {
+            $query->where('senderid', $senderId);
 
-    $query->where('senderid', 'like', "%{$senderId}%");
+        })
 
-})
+        ->when($request->start_date, function ($query, $startDate) {
 
-->when($request->end_date, function ($query, $endDate) {
+            $query->whereDate('created_at', '>=', $startDate);
 
-    $query->whereDate('created_at', '<=', $endDate);
+        })
 
-})
+        ->when($request->end_date, function ($query, $endDate) {
 
-            ->latest('created_at')
+            $query->whereDate('created_at', '<=', $endDate);
 
-            ->paginate(20)
+        })
 
-            ->withQueryString();
+        ->latest('created_at')
 
-       return view('messages.index', [
-    'messages' => $messages,
+        ->paginate($perPage)
 
-    'totalMessagesToday' => $totalMessagesToday,
-    'submittedToday' => $submittedToday,
-    'pendingToday' => $pendingToday,
-    'failedToday' => $failedToday,
-]);
-    }
+        ->withQueryString();
 
-    public function show(Message $message): View
-{
-    return view('messages.show', [
-        'message' => $message,
+    return view('messages.index', [
+        'messages' => $messages,
+        'senderIds' => $senderIds,
+
+        'totalMessagesToday' => $totalMessagesToday,
+        'deliveredToday' => $deliveredToday,
+        'pendingToday' => $pendingToday,
+        'failedToday' => $failedToday,
     ]);
 }
 }
+
+
