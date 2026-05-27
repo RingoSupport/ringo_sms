@@ -13,7 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 //use Spatie\Activitylog\LogsActivity;
 //use Spatie\Activitylog\LogOptions;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'client_id', 'role', 'status'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,4 +32,19 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isSuperAdmin(): bool
+{
+    return $this->role === 'super_admin';
+}
+
+public function isOperations(): bool
+{
+    return $this->role === 'operations';
+}
+
+public function isClient(): bool
+{
+    return $this->role === 'client';
+}
 }

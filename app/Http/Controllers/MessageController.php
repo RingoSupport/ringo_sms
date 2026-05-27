@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -53,7 +54,18 @@ $failedToday = Message::query()
 
     $perPage = $request->per_page ?? 10;
 
-    $messages = Message::query()
+   $messages = Message::query()
+
+    ->when(
+        Auth::user()?->isClient(),
+        function ($query) {
+
+            $query->forClient(
+                Auth::user()?->client_id
+            );
+
+        }
+    )
 
         ->when($request->search, function ($query, $search) {
 
