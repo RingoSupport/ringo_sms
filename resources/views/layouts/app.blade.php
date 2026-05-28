@@ -7,7 +7,13 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
 </head>
+
 
 <body class="bg-slate-100 font-sans antialiased">
 

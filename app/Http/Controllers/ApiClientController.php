@@ -73,7 +73,7 @@ public function store(Request $request): RedirectResponse
         'status'      => ['required', 'in:active,inactive'],
     ]);
 
-  
+
 
 
     $plainPassword = Str::password(12);
@@ -103,7 +103,7 @@ public function store(Request $request): RedirectResponse
     } catch (\Throwable $e) {
 
         DB::rollBack();
-        throw $e;
+         dd($e->getMessage());
 
     }
 
@@ -126,6 +126,55 @@ public function updateStatus(ApiClient $client): RedirectResponse
     return back()->with(
         'success',
         'Client status updated successfully.'
+    );
+}
+
+public function fundWallet(Request $request, ApiClient $client): RedirectResponse
+{
+    $validated = $request->validate([
+        'amount' => ['required', 'numeric', 'min:1'],
+        'description' => ['nullable', 'string', 'max:255'],
+    ]);
+
+    $wallet = $client->wallet;
+
+    abort_if(! $wallet, 404);
+
+    DB::transaction(function () use ($wallet, $validated) {
+
+        $amount = (float) $validated['amount'];
+
+        $before = $wallet->balance;
+
+        $after = $before + $amount;
+
+        $wallet->increment('balance', $amount);
+
+        DB::table('wallet_history')->insert([
+
+            'wallet_id' => $wallet->id,
+
+            'reference' => 'CR-' . strtoupper(Str::random(10)),
+
+            'type' => 'credit',
+
+            'amount' => $amount,
+
+            'balance_before' => $before,
+
+            'balance_after' => $after,
+
+            'description' => $validated['description'] ?? 'Wallet funding',
+
+            'created_at' => now(),
+
+        ]);
+
+    });
+
+    return back()->with(
+        'success',
+        'Wallet funded successfully.'
     );
 }
 

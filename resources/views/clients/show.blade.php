@@ -122,6 +122,7 @@
 
             <div class="space-y-6 lg:col-span-2">
 
+                <div x-data="{ openFundWallet: false }">
                 <x-ui.card>
 
                     <div class="mb-6 flex items-center justify-between">
@@ -146,33 +147,147 @@
 
                             </div>
 
+
                         </div>
 
-                        <div>
 
-                            @if ($client->wallet)
 
-                                <x-ui.badge :color="$client->wallet->status === 'active' ? 'green' : 'red'">
 
-                                    {{ ucfirst($client->wallet->status) }}
+                        <div class="flex items-center gap-3">
 
-                                </x-ui.badge>
+    @if ($client->wallet)
 
-                            @else
+        <x-ui.badge :color="$client->wallet->status === 'active' ? 'green' : 'red'">
 
-                                <x-ui.badge color="gray">
-                                    No Wallet
-                                </x-ui.badge>
+            {{ ucfirst($client->wallet->status) }}
 
-                            @endif
+        </x-ui.badge>
+
+    @else
+
+        <x-ui.badge color="gray">
+            No Wallet
+        </x-ui.badge>
+
+    @endif
+
+    <button
+    type="button"
+    @click="openFundWallet = true"
+    class="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+
+    + Fund Wallet
+
+</button>
+
+</div>
+
+                    </div>
+
+
+
+                </x-ui.card>
+
+                    <div
+                        x-show="openFundWallet"
+                        x-cloak
+                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+
+                        <div
+                            @click.away="openFundWallet = false"
+                            class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+
+                            <div class="mb-6 flex items-center justify-between">
+
+                                <h2 class="text-lg font-semibold text-slate-900">
+
+                                    Fund Wallet
+
+                                </h2>
+
+                                <button
+                                    type="button"
+                                    @click="openFundWallet = false"
+
+                                    class="text-slate-500 hover:text-slate-700">
+
+                                    ✕
+
+                                </button>
+
+                            </div>
+
+                            <form method="POST"
+                                action="{{ route('clients.fund-wallet', $client) }}"
+                                class="space-y-4">
+
+                                @csrf
+
+                                <div>
+
+                                    <label class="mb-1 block text-sm font-medium text-slate-700">
+
+                                        Amount
+
+                                    </label>
+
+                                    <input
+    type="number"
+                                    name="amount"
+                                    min="1"
+                                    step="0.01"
+                                    required
+                                    onkeydown="return !['e', 'E', '+', '-'].includes(event.key)"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-slate-500 focus:outline-none">
+
+                                </div>
+
+                                <div>
+
+                                    <label class="mb-1 block text-sm font-medium text-slate-700">
+
+                                        Description
+
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="description"
+                                        placeholder="Optional note"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-slate-500 focus:outline-none">
+
+                                </div>
+
+                                <div class="flex justify-end gap-3 pt-4">
+
+                                    <button
+                                        type="button"
+                                        @click="openFundWallet = false"
+                                        class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+
+                                        Cancel
+
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+
+                                        Fund Wallet
+
+                                    </button>
+
+                                </div>
+
+                            </form>
 
                         </div>
 
                     </div>
 
-                </x-ui.card>
-
+                </div>
                 <x-ui.card>
+
 
                     <div class="mb-4 flex items-center justify-between">
 

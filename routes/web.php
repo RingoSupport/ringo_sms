@@ -94,9 +94,8 @@ Route::middleware('auth')->group(function () {
     ->middleware('permission:disable clients')
     ->name('clients.update-status');
 
-    // Route::get('/my-wallet', [WalletController::class, 'myWallet'])
-    // ->middleware(['auth'])
-    // ->name('wallet.my');
+ Route::post('/clients/{client}/fund-wallet', [ApiClientController::class, 'fundWallet'])
+    ->name('clients.fund-wallet');
 
     Route::get('/messages', [MessageController::class, 'index'])
     ->middleware('permission:view messages')
