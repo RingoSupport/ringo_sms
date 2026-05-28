@@ -13,12 +13,15 @@ use Spatie\Permission\Traits\HasRoles;
 //use Spatie\Activitylog\LogsActivity;
 //use Spatie\Activitylog\LogOptions;
 
-#[Fillable(['name', 'email', 'password', 'client_id', 'role', 'status'])]
-#[Hidden(['password', 'remember_token'])]
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
   use HasFactory, Notifiable, HasRoles;
+
+
+    protected $fillable = ['name', 'email', 'password', 'client_id', 'role', 'status'];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Get the attributes that should be cast.

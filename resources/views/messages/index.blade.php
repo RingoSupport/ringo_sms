@@ -2,12 +2,12 @@
 
     <div class="space-y-6 overflow-x-hidden">
 
-        <x-ui.page-header
-            title="Messages"
-            :description="Auth::user()?->isClient()
-    ? 'Track your SMS delivery activity and message performance.'
-    : 'Monitor SMS delivery activity and investigate message operations.'"
-        />
+      <x-ui.page-header
+    title="Messages"
+    :description="Auth::guard('client')->check()
+        ? 'Track your SMS delivery activity and message performance.'
+        : 'Monitor SMS delivery activity and investigate message operations.'"
+/>
 
         <x-ui.card>
 
@@ -22,15 +22,13 @@
                     </label>
 
                     <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="{{ Auth::user()?->isClient()
-                                ? 'Search MSISDN or Sender ID'
-                                : 'MSISDN, Sender ID, Message ID'
-                            }}"
-                        class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
-                    >
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search by Message ID or MSISDN"
+                    class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
+                >
+
 
                 </div>
 
@@ -101,7 +99,7 @@
 
 
                 </div>
-@if (! Auth::user()?->isClient())
+@if (! Auth::guard('client')->check())
                 <div>
 
     <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -333,14 +331,14 @@
                                     <div class="space-y-2">
 
     <div class="font-medium text-slate-700">
-       {{ Auth::user()?->isClient()
+       {{ Auth::guard('client')->check()
     ? 'No SMS activity yet'
     : 'No messages found'
 }}
     </div>
 
     <div class="text-xs text-slate-500">
-       {{ Auth::user()?->isClient()
+       {{ Auth::guard('client')->check()
     ? 'Your SMS traffic will appear here once messages are processed.'
     : 'SMS activity matching the selected filters will appear here.'
 }}
