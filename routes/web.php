@@ -51,8 +51,8 @@ Route::middleware('auth:client')->group(function () {
 
     Route::get('/client/dashboard', [DashboardController::class, 'index'])
         ->name('client.dashboard');
-    Route::get('/client/messages', [MessageController::class, 'index'])
-        ->name('client.messages.index');
+   Route::get('/client/messages/{message}', [MessageController::class, 'show'])
+    ->name('client.messages.show');
     Route::get('/client/my-wallet', [WalletController::class, 'myWallet'])
         ->name('client.wallet.my');
 
@@ -94,7 +94,8 @@ Route::middleware('auth')->group(function () {
     ->middleware('permission:disable clients')
     ->name('clients.update-status');
 
- Route::post('/clients/{client}/fund-wallet', [ApiClientController::class, 'fundWallet'])
+Route::post('/clients/{client}/fund-wallet', [ApiClientController::class, 'fundWallet'])
+    ->middleware('permission:fund wallets')
     ->name('clients.fund-wallet');
 
     Route::get('/messages', [MessageController::class, 'index'])

@@ -17,6 +17,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
             'view wallets',
            'view wallet history',
+           'fund wallets',
 
             'view messages',
 

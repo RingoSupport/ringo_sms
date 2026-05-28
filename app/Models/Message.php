@@ -8,7 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
-    protected $table = 'messages';
+   protected $table;
+
+public function __construct(array $attributes = [])
+{
+    parent::__construct($attributes);
+
+    $this->table = config('sms.tables.messages', 'messages');
+}
 
     protected $keyType = 'string';
 

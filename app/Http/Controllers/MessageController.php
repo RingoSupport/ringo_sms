@@ -38,7 +38,7 @@ $senderIds = Message::query()
 
     ->pluck('senderid');
 
-    $perPage = $request->per_page ?? 10;
+   $perPage = min((int) $request->per_page ?: 10, 100);
 
    $messages = Message::query()
 
@@ -67,7 +67,7 @@ $senderIds = Message::query()
 
             }
 
-            if ($status === 'pending') {
+            elseif ($status === 'pending') {
 
                 $query->where(function ($q) {
 
@@ -78,7 +78,7 @@ $senderIds = Message::query()
 
             }
 
-            if ($status === 'failed') {
+            elseif ($status === 'failed') {
 
                 $query->whereIn('dlr_status', [
                     'EXPIRD',

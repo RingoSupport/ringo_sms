@@ -252,20 +252,28 @@
 
                     <tbody class="divide-y divide-slate-200 bg-white">
 
-                        @forelse ($messages as $message)
+                       @php
+    $messageShowRoute = Auth::guard('client')->check()
+        ? 'client.messages.show'
+        : 'messages.show';
+@endphp
 
-                           <tr
-    onclick="window.location='{{ route('messages.show', [
-    'message' => $message,
-    'page' => request('page'),
-    'search' => request('search'),
-    'status' => request('status'),
-    'network' => request('network'),
-    'start_date' => request('start_date'),
-    'end_date' => request('end_date'),
-]) }}'"
-    class="cursor-pointer hover:bg-slate-50 transition-colors"
->
+<tbody class="divide-y divide-slate-200 bg-white">
+
+    @forelse ($messages as $message)
+
+        <tr
+            onclick="window.location='{{ route($messageShowRoute, [
+                'message' => $message,
+                'page' => request('page'),
+                'search' => request('search'),
+                'status' => request('status'),
+                'network' => request('network'),
+                'start_date' => request('start_date'),
+                'end_date' => request('end_date'),
+            ]) }}'"
+            class="cursor-pointer hover:bg-slate-50 transition-colors"
+        >
 
                                 <td class="px-6 py-3 text-sm text-slate-700">
                                     {{ $message->id }}
