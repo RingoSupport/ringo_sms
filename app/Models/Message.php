@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ApiClient;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
@@ -15,6 +16,7 @@ class Message extends Model
 
     protected $fillable = [
         'id',
+        'client_id',
         'msisdn',
         'pages',
         'text',
@@ -42,12 +44,12 @@ class Message extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function client()
+public function client(): BelongsTo
 {
     return $this->belongsTo(ApiClient::class, 'client_id');
 }
 
-public function scopeForClient($query, $clientId)
+public function scopeForClient($query, int $clientId)
 {
     return $query->where('client_id', $clientId);
 }

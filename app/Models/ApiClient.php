@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Models\Message;
 
-class ApiClient extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+class ApiClient extends Authenticatable
 {
     protected $table = 'api_clients';
 
@@ -23,6 +22,10 @@ class ApiClient extends Model
     protected $hidden = [
         'password',
     ];
+
+    protected $casts = [
+    'password' => 'hashed',
+];
 
     public function wallet(): HasOne
     {

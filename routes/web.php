@@ -7,8 +7,11 @@ use App\Http\Controllers\ApiClientController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Auth\OtpController;
-use App\Models\Message;
-use App\Models\Wallet;
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\Auth\ClientAuthenticatedSessionController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -16,215 +19,9 @@ Route::get('/', function () {
 
 
 
-Route::get('/dashboard', function () {
-
-    $totalMessages = Message::query()
-        ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-->where('created_at', '<=', date('Y-m-d 23:59:59'))
-        ->count();
-
-    $deliveredMessages = Message::query()
-        ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-        ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-        ->where('dlr_status', 'DELIVRD')
-        ->count();
-
-        $pendingMessages = Message::query()
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->where(function ($query) {
-
-        $query->where('dlr_status', '0')
-              ->orWhere('dlr_status', 'PEND')
-              ->orWhereNull('dlr_status');
-
-    })
-
-    ->count();
-
-    $failedMessages = Message::query()
-        ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-        ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-        ->whereIn('dlr_status', [
-            'EXPIRD',
-            'FAILED',
-            'UNDELIV',
-        ])
-        ->count();
-
-        $deliveryRate = $totalMessages > 0
-    ? round(($deliveredMessages / $totalMessages) * 100, 2)
-    : 0;
-
-    $totalWalletBalance = Wallet::query()
-        ->sum('balance');
-
-        $hourlyTraffic = Message::query()
-
-        ->selectRaw('
-            HOUR(created_at) as hour,
-            COUNT(*) as total
-        ', [])
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->groupByRaw('HOUR(created_at)')
-
-    ->orderBy('hour')
-
-    ->get();
-
-    $recentFailedMessages = Message::query()
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->whereIn('dlr_status', [
-        'EXPIRD',
-        'FAILED',
-        'UNDELIV',
-    ])
-
-    ->latest('created_at')
-
-    ->limit(10)
-
-    ->get();
-
-    $recentPendingMessages = Message::query()
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->where(function ($query) {
-
-        $query->where('dlr_status', '0')
-              ->orWhere('dlr_status', 'PEND')
-              ->orWhereNull('dlr_status');
-
-    })
-
-    ->latest('created_at')
-
-    ->limit(10)
-
-    ->get();
-
-    $networkHealth = Message::query()
-
-    ->selectRaw('
-        network,
-
-        COUNT(*) as total,
-
-        SUM(CASE WHEN dlr_status = "DELIVRD" THEN 1 ELSE 0 END) as delivered,
-
-        SUM(CASE
-            WHEN dlr_status IN ("EXPIRD", "FAILED", "UNDELIV")
-            THEN 1
-            ELSE 0
-        END) as failed,
-
-        SUM(CASE
-            WHEN dlr_status IN ("0", "PEND")
-            OR dlr_status IS NULL
-            THEN 1
-            ELSE 0
-        END) as pending
-    ', [])
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->groupBy('network')
-
-    ->orderByDesc('total')
-
-    ->get();
-
-    $topSenderIds = Message::query()
-
-    ->selectRaw('
-        senderid,
-        COUNT(*) as total
-    ', [])
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->groupBy('senderid')
-
-    ->orderByDesc('total')
-
-    ->limit(10)
-
-    ->get();
-    $activeClients = Message::query()
-
-    ->selectRaw('
-        client_id,
-        COUNT(*) as total
-    ', [])
-
-    ->with('client')
-
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
-    ->whereNotNull('client_id')
-
-    ->groupBy('client_id')
-
-    ->orderByDesc('total')
-
-    ->limit(10)
-
-    ->get();
-
-    $lowWalletClients = Wallet::query()
-
-    ->with('client')
-
-    ->where('balance', '<=', 5000)
-
-    ->orderBy('balance')
-
-    ->limit(10)
-
-    ->get();
-
-    return view('dashboard', [
-
-        'totalMessages' => $totalMessages,
-
-        'deliveredMessages' => $deliveredMessages,
-
-        'failedMessages' => $failedMessages,
-
-        'totalWalletBalance' => $totalWalletBalance,
-        'deliveryRate' => $deliveryRate,
-        'hourlyTraffic' => $hourlyTraffic,
-        'recentFailedMessages' => $recentFailedMessages,
-        'pendingMessages' => $pendingMessages,
-        'networkHealth' => $networkHealth,
-        'topSenderIds' => $topSenderIds,
-        'activeClients' => $activeClients,
-        'lowWalletClients' => $lowWalletClients,
-        'recentPendingMessages' => $recentPendingMessages,
-
-    ]);
-
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 
  Route::middleware('pending.otp')->group(function () {
@@ -237,6 +34,30 @@ Route::get('/dashboard', function () {
 
     Route::post('/otp/resend', [OtpController::class, 'resend'])
         ->name('otp.resend');
+
+});
+
+
+Route::middleware('guest:client')->group(function () {
+
+    Route::get('/client/login', [ClientAuthenticatedSessionController::class, 'create'])
+        ->name('client.login');
+
+    Route::post('/client/login', [ClientAuthenticatedSessionController::class, 'store']);
+
+});
+
+Route::middleware('auth:client')->group(function () {
+
+    Route::get('/client/dashboard', [DashboardController::class, 'index'])
+        ->name('client.dashboard');
+    Route::get('/client/messages', [MessageController::class, 'index'])
+        ->name('client.messages.index');
+    Route::get('/client/my-wallet', [WalletController::class, 'myWallet'])
+        ->name('client.wallet.my');
+
+        Route::post('/client/logout', [ClientAuthenticatedSessionController::class, 'destroy'])
+    ->name('client.logout');
 
 });
 
@@ -265,7 +86,6 @@ Route::middleware('auth')->group(function () {
     ->middleware('permission:create clients')
     ->name('clients.create');
     Route::post('/clients', [ApiClientController::class, 'store'])
-    ->middleware('permission:create clients')
     ->name('clients.store');
     Route::get('/clients/{client}', [ApiClientController::class, 'show'])
     ->middleware('permission:view clients')
@@ -273,6 +93,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/clients/{client}/status', [ApiClientController::class, 'updateStatus'])
     ->middleware('permission:disable clients')
     ->name('clients.update-status');
+
+    // Route::get('/my-wallet', [WalletController::class, 'myWallet'])
+    // ->middleware(['auth'])
+    // ->name('wallet.my');
 
     Route::get('/messages', [MessageController::class, 'index'])
     ->middleware('permission:view messages')

@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use App\Models\Wallet;
-use App\Support\Audit;
+//use App\Support\Audit;
 
 class ApiClientController extends Controller
 {
@@ -64,54 +65,52 @@ public function create(): View
 
 public function store(Request $request): RedirectResponse
 {
+
+
     $validated = $request->validate([
         'client_name' => ['required', 'string', 'max:150'],
-        //'company_name' => ['nullable', 'string', 'max:255'],
-        //'email' => ['nullable', 'email', 'max:255'],
-        //'phone' => ['nullable', 'string', 'max:255'],
-        'username' => ['required', 'string', 'max:100', 'unique:api_clients,username'],
-        'status' => ['required', 'in:active,inactive'],
+       'username' => ['required', 'string', 'max:100'],
+        'status'      => ['required', 'in:active,inactive'],
     ]);
+
+  
+
 
     $plainPassword = Str::password(12);
 
-    DB::transaction(function () use ($validated, $plainPassword, &$client) {
+    DB::beginTransaction();
+
+    try {
 
         $client = ApiClient::create([
-
             'client_name' => $validated['client_name'],
-            //'company_name' => $validated['company_name'] ?? null,
-           // 'email' => $validated['email'] ?? null,
-            //'phone' => $validated['phone'] ?? null,
-            'username' => $validated['username'],
-            'status' => $validated['status'],
-
-            'password' => Hash::make($plainPassword),
-
+            'username'    => $validated['username'],
+            'status'      => $validated['status'],
+            'password'    => Hash::make($plainPassword),
         ]);
 
 
 
-        Wallet::create([
-
-            'client_id' => $client->id,
+        $client->wallet()->create([
             'balance' => 0,
-            'status' => 'active',
-
+            'status'  => 'active',
         ]);
 
-        Audit::log(
-            action: 'client_created',
-            description: 'Created API client: ' . $client->client_name,
-            target: $client
-        );
 
-    });
+
+        DB::commit();
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+        throw $e;
+
+    }
 
     return redirect()
         ->route('clients.show', $client)
-        ->with('generated_password', $plainPassword)
-        ->with('success', 'Client created successfully.');
+        ->with('success', 'Client created successfully.')
+        ->with('generated_password', $plainPassword);
 }
 
 public function updateStatus(ApiClient $client): RedirectResponse
@@ -122,18 +121,7 @@ public function updateStatus(ApiClient $client): RedirectResponse
             : 'active',
     ]);
 
-    Audit::log(
-    action: $client->status === 'active'
-        ? 'client_activated'
-        : 'client_disabled',
 
-    description: ($client->status === 'active'
-        ? 'Activated client: '
-        : 'Disabled client: ')
-        . $client->client_name,
-
-    target: $client
-);
 
     return back()->with(
         'success',

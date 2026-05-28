@@ -33,15 +33,39 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+    @if (Route::has('password.request'))
+
+        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+           href="{{ route('password.request') }}">
+
+            {{ __('Forgot your password?') }}
+
+        </a>
+
+    @endif
+
+    <x-primary-button class="ms-3">
+        {{ __('Log in') }}
+    </x-primary-button>
+
+</div>
+
+<div class="mt-6 text-center border-t border-slate-200 pt-4">
+
+    <p class="text-sm text-slate-600">
+
+        Are you an API client?
+
+        <a href="{{ route('client.login') }}"
+           class="font-medium text-slate-900 underline hover:text-slate-700">
+
+            Access Client Portal
+
+        </a>
+
+    </p>
+
+</div>
     </form>
 </x-guest-layout>

@@ -203,6 +203,7 @@
 
 </div>
 
+@if (! Auth::guard('client')->check())
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
     <div class="rounded-xl border border-slate-200 bg-white">
 
@@ -273,7 +274,7 @@
 
 </div>
 
-    <div class="rounded-xl border border-slate-200 bg-white">
+ <div class="rounded-xl border border-slate-200 bg-white">
 
         <div class="border-b border-slate-200 px-6 py-4">
 
@@ -411,7 +412,7 @@
 
 </div>
 </div>
-
+@endif
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
     <div class="rounded-xl border border-slate-200 bg-white">

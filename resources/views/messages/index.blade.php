@@ -4,75 +4,10 @@
 
         <x-ui.page-header
             title="Messages"
-            description="Monitor SMS delivery activity and investigate message operations."
+            :description="Auth::user()?->isClient()
+    ? 'Track your SMS delivery activity and message performance.'
+    : 'Monitor SMS delivery activity and investigate message operations.'"
         />
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-
-    <x-ui.card>
-
-        <div class="space-y-2">
-
-            <div class="text-sm font-medium text-slate-500">
-                Total Messages Today
-            </div>
-
-            <div class="text-3xl font-bold text-slate-900">
-                {{ number_format($totalMessagesToday) }}
-            </div>
-
-        </div>
-
-    </x-ui.card>
-
-    <x-ui.card>
-
-        <div class="space-y-2">
-
-            <div class="text-sm font-medium text-slate-500">
-                Derlivered Today
-            </div>
-
-            <div class="text-3xl font-bold text-emerald-600">
-                {{ number_format($deliveredToday) }}
-            </div>
-
-        </div>
-
-    </x-ui.card>
-
-    <x-ui.card>
-
-        <div class="space-y-2">
-
-            <div class="text-sm font-medium text-slate-500">
-                Pending Today
-            </div>
-
-            <div class="text-3xl font-bold text-amber-600">
-                {{ number_format($pendingToday) }}
-            </div>
-
-        </div>
-
-    </x-ui.card>
-
-    <x-ui.card>
-
-        <div class="space-y-2">
-
-            <div class="text-sm font-medium text-slate-500">
-                Failed Today
-            </div>
-
-            <div class="text-3xl font-bold text-rose-600">
-                {{ number_format($failedToday) }}
-            </div>
-
-        </div>
-
-    </x-ui.card>
-
-</div>
 
         <x-ui.card>
 
@@ -90,7 +25,10 @@
                         type="text"
                         name="search"
                         value="{{ request('search') }}"
-                        placeholder="MSISDN, Sender ID, Message ID"
+                        placeholder="{{ Auth::user()?->isClient()
+                                ? 'Search MSISDN or Sender ID'
+                                : 'MSISDN, Sender ID, Message ID'
+                            }}"
                         class="w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500"
                     >
 
@@ -163,7 +101,7 @@
 
 
                 </div>
-
+@if (! Auth::user()?->isClient())
                 <div>
 
     <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -193,6 +131,7 @@
 </select>
 
 </div>
+@endif
 
                     <div>
 
@@ -394,11 +333,17 @@
                                     <div class="space-y-2">
 
     <div class="font-medium text-slate-700">
-        No messages found
+       {{ Auth::user()?->isClient()
+    ? 'No SMS activity yet'
+    : 'No messages found'
+}}
     </div>
 
     <div class="text-xs text-slate-500">
-        SMS activity matching the selected filters will appear here.
+       {{ Auth::user()?->isClient()
+    ? 'Your SMS traffic will appear here once messages are processed.'
+    : 'SMS activity matching the selected filters will appear here.'
+}}
     </div>
 
 </div>

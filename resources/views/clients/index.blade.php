@@ -32,7 +32,7 @@
 
             <x-slot:actions>
 
-            @can('create client')
+
 
                <a href="{{ route('clients.create') }}">
 
@@ -41,7 +41,7 @@
                     </x-ui.button>
 
                 </a>
-            @endcan
+         
 
             </x-slot:actions>
 

@@ -13,59 +13,40 @@ class MessageController extends Controller
 {
     public function index(Request $request): View
     {
-    $totalMessagesToday = Message::query()
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->count();
 
-$deliveredToday = Message::query()
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->where('dlr_status', 'DELIVRD')
-    ->count();
 
-$pendingToday = Message::query()
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-  ->where(function ($query) {
 
-        $query->where('dlr_status', '0')
-              ->orWhere('dlr_status', 'PEND');
+   $client = Auth::guard('client')->user();
+
+$clientId = $client?->id;
+
+$senderIds = Message::query()
+
+    ->when($clientId, function ($query) use ($clientId) {
+
+        $query->forClient($clientId);
 
     })
-    ->count();
 
-$failedToday = Message::query()
-    ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-    ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-    ->whereIn('dlr_status', [
-        'EXPIRD',
-        'FAILED',
-        'UNDELIV',
-    ])
+    ->select('senderid')
 
-    ->count();
-     $senderIds = Message::query()
-        ->select('senderid')
-        ->distinct()
-        ->whereNotNull('senderid')
-        ->orderBy('senderid')
-        ->pluck('senderid');
+    ->distinct()
+
+    ->whereNotNull('senderid')
+
+    ->orderBy('senderid')
+
+    ->pluck('senderid');
 
     $perPage = $request->per_page ?? 10;
 
    $messages = Message::query()
 
-    ->when(
-        Auth::user()?->isClient(),
-        function ($query) {
+    ->when($clientId, function ($query) use ($clientId) {
 
-            $query->forClient(
-                Auth::user()?->client_id
-            );
+    $query->forClient($clientId);
 
-        }
-    )
+})
 
         ->when($request->search, function ($query, $search) {
 
@@ -143,10 +124,26 @@ $failedToday = Message::query()
         'messages' => $messages,
         'senderIds' => $senderIds,
 
-        'totalMessagesToday' => $totalMessagesToday,
-        'deliveredToday' => $deliveredToday,
-        'pendingToday' => $pendingToday,
-        'failedToday' => $failedToday,
+
+    ]);
+}
+
+public function show(string $id): View
+{
+    $client = Auth::guard('client')->user();
+   $message = Message::query()
+
+    ->when($client, function ($query) use ($client) {
+
+        $query->forClient($client->id);
+
+    })
+        ->findOrFail($id);
+
+    return view('messages.show', [
+
+        'message' => $message,
+
     ]);
 }
 }
