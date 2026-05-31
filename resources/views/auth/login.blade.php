@@ -1,6 +1,17 @@
 <x-guest-layout>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="mb-6">
+
+    <h2 class="text-lg font-semibold text-slate-900">
+        Administrator Sign In
+    </h2>
+
+    <p class="mt-1 text-sm text-slate-500">
+        Secure access for platform operators and administrators.
+    </p>
+
+</div>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf

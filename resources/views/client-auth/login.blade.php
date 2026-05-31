@@ -3,11 +3,11 @@
     <div class="mb-6 text-center">
 
         <h2 class="text-2xl font-bold text-slate-900">
-            Client Portal
+            Mobifin Client Portal
         </h2>
 
         <p class="mt-2 text-sm text-slate-600">
-            Sign in to access your SMS dashboard and wallet.
+            Manage your messages, wallet balance and account activity.
         </p>
 
     </div>
