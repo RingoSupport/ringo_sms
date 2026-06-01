@@ -79,6 +79,19 @@
             @endcan
 @endif
 
+@if (! Auth::guard('client')->check())
+    @can('view sms pricing')
+        <a href="{{ route('provider-sms.index') }}"
+            class="flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors
+            {{ request()->routeIs('provider-sms.*')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-100' }}">
+            SMS Pricing
+        </a>
+    @endcan
+@endif
+
+
 
     </nav>
 

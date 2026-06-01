@@ -34,11 +34,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'create clients',
             'edit clients',
             'disable clients',
-            'view messages',
+            
 
             'view roles',
             'create roles',
             'edit roles',
+
+            'view sms pricing',
+            'edit sms pricing'
         ];
 
         foreach ($permissions as $permission) {

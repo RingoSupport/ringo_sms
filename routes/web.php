@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Auth\ClientAuthenticatedSessionController;
+use App\Http\Controllers\ProviderSmsController;
 
 
 Route::get('/', function () {
@@ -124,6 +125,18 @@ Route::post('/clients/{client}/fund-wallet', [ApiClientController::class, 'fundW
     Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])
         ->middleware('permission:edit roles')
         ->name('roles.edit');
+
+           Route::get('/provider-sms', [ProviderSmsController::class, 'index'])
+    ->middleware('permission:view sms pricing')
+    ->name('provider-sms.index');
+
+Route::get('/provider-sms/{providerSms}/edit', [ProviderSmsController::class, 'edit'])
+    ->middleware('permission:edit sms pricing')
+    ->name('provider-sms.edit');
+
+Route::put('/provider-sms/{providerSms}', [ProviderSmsController::class, 'update'])
+    ->middleware('permission:edit sms pricing')
+    ->name('provider-sms.update');
 
     Route::patch('/roles/{role}', [RoleController::class, 'update'])
         ->middleware('permission:edit roles')
