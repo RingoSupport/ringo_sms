@@ -51,14 +51,18 @@ Route::middleware('auth:client')->group(function () {
 
     Route::get('/client/dashboard', [DashboardController::class, 'index'])
         ->name('client.dashboard');
-   Route::get('/client/messages/{message}', [MessageController::class, 'show'])
-    ->name('client.messages.show');
+
+    Route::get('/client/messages', [MessageController::class, 'index'])
+        ->name('client.messages.index');
+
+    Route::get('/client/messages/{message}', [MessageController::class, 'show'])
+        ->name('client.messages.show');
+
     Route::get('/client/my-wallet', [WalletController::class, 'myWallet'])
         ->name('client.wallet.my');
 
-        Route::post('/client/logout', [ClientAuthenticatedSessionController::class, 'destroy'])
-    ->name('client.logout');
-
+    Route::post('/client/logout', [ClientAuthenticatedSessionController::class, 'destroy'])
+        ->name('client.logout');
 });
 
 Route::middleware('auth')->group(function () {

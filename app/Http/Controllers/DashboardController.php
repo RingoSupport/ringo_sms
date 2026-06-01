@@ -154,12 +154,9 @@ $clientId = $client?->id;
     ->get();
 
     $networkHealth = Message::query()
-      ->when($clientId, function ($query) use ($clientId) {
-
+    ->when($clientId, function ($query) use ($clientId) {
         $query->forClient($clientId);
-
     })
-
     ->selectRaw('
         network,
 
@@ -178,17 +175,20 @@ $clientId = $client?->id;
             OR dlr_status IS NULL
             THEN 1
             ELSE 0
-        END) as pending
-    ', [])
+        END) as pending,
 
+            ROUND(
+            (
+                SUM(CASE WHEN dlr_status = "DELIVRD" THEN 1 ELSE 0 END)
+                / NULLIF(COUNT(*), 0)
+            ) * 100,
+            2
+        ) as delivery_rate
+    ')
     ->where('created_at', '>=', date('Y-m-d 00:00:00'))
-
     ->where('created_at', '<=', date('Y-m-d 23:59:59'))
-
     ->groupBy('network')
-
     ->orderByDesc('total')
-
     ->get();
 
     $topSenderIds = Message::query()

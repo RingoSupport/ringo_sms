@@ -146,6 +146,10 @@
                         Failed
                     </th>
 
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Rate
+                    </th>
+
                 </tr>
 
             </thead>
@@ -156,8 +160,41 @@
 
                     <tr>
 
-                        <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
-                            {{ $network->network ?? 'Unknown' }}
+                      <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
+
+                            @php
+                                $networkName = strtoupper(trim($network->network ?? 'UNKNOWN'));
+                            @endphp
+
+                            @if($networkName === 'MTN')
+                                <span class="font-semibold text-yellow-600">
+                                    MTN
+                                </span>
+
+                            @elseif($networkName === 'AIRTEL')
+                                <span class="font-semibold text-red-600">
+                                    Airtel
+                                </span>
+
+                            @elseif($networkName === 'GLO')
+                                <span class="font-semibold text-green-600">
+                                    Glo
+                                </span>
+
+                            @elseif(
+                                $networkName === '9MOBILE' ||
+                                $networkName === 'ETISALAT'
+                            )
+                                <span class="font-semibold text-emerald-600">
+                                    9mobile
+                                </span>
+
+                            @else
+                                <span class="font-semibold text-slate-600">
+                                    {{ $network->network ?? 'Unknown' }}
+                                </span>
+                            @endif
+
                         </td>
 
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
@@ -176,6 +213,24 @@
                             {{ number_format($network->failed) }}
                         </td>
 
+                        <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold">
+                                @if($network->delivery_rate >= 95)
+                                    <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
+                                        {{ $network->delivery_rate }}%
+                                    </span>
+
+                                @elseif($network->delivery_rate >= 85)
+                                    <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">
+                                        {{ $network->delivery_rate }}%
+                                    </span>
+
+                                @else
+                                    <span class="rounded-full bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-700">
+                                        {{ $network->delivery_rate }}%
+                                    </span>
+                                @endif
+
+                        </td>
                     </tr>
 
                 @empty
