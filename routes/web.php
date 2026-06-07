@@ -99,9 +99,21 @@ Route::middleware('auth')->group(function () {
     ->middleware('permission:disable clients')
     ->name('clients.update-status');
 
+    Route::patch(
+    '/clients/{client}/webhook',
+    [ApiClientController::class, 'updateWebhook']
+)->name('clients.webhook');
+
+Route::patch(
+    '/clients/{client}/pricing',
+    [ApiClientController::class, 'updatePricing']
+)->name('clients.pricing');
+
 Route::post('/clients/{client}/fund-wallet', [ApiClientController::class, 'fundWallet'])
     ->middleware('permission:fund wallets')
     ->name('clients.fund-wallet');
+
+    
 
     Route::get('/messages', [MessageController::class, 'index'])
     ->middleware('permission:view messages')

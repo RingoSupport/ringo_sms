@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
 use App\Models\Wallet;
+use App\Models\ClientSmsPricing;
 //use App\Support\Audit;
 
 class ApiClientController extends Controller
@@ -50,6 +51,8 @@ public function show(ApiClient $client): View
                 ->limit(10);
 
         },
+
+        'smsPricing',
     ]);
 
     return view('clients.show', [
@@ -71,6 +74,8 @@ public function store(Request $request): RedirectResponse
         'client_name' => ['required', 'string', 'max:150'],
        'username' => ['required', 'string', 'max:100'],
         'status'      => ['required', 'in:active,inactive'],
+          'webhook_url'      => ['nullable', 'url', 'max:500'],
+    'webhook_enabled'  => ['nullable', 'boolean'],
     ]);
 
 
@@ -87,6 +92,8 @@ public function store(Request $request): RedirectResponse
             'username'    => $validated['username'],
             'status'      => $validated['status'],
             'password'    => Hash::make($plainPassword),
+            'webhook_url' => $validated['webhook_url'] ?? null,
+            'webhook_enabled' => $validated['webhook_enabled'] ?? false,
         ]);
 
 
@@ -178,4 +185,60 @@ public function fundWallet(Request $request, ApiClient $client): RedirectRespons
     );
 }
 
+
+public function updateWebhook(
+    Request $request,
+    ApiClient $client
+): RedirectResponse
+{
+    $validated = $request->validate([
+        'webhook_url' => [
+            'nullable',
+            'url',
+            'max:500',
+        ],
+    ]);
+
+    $client->update([
+        'webhook_url' => $validated['webhook_url'] ?? null,
+        'webhook_enabled' => $request->boolean('webhook_enabled'),
+    ]);
+
+    return back()->with(
+        'success',
+        'Webhook configuration updated successfully.'
+    );
+}
+
+public function updatePricing(
+    Request $request,
+    ApiClient $client
+): RedirectResponse
+{
+    $validated = $request->validate([
+        'pricing' => ['required', 'array'],
+    ]);
+
+    foreach ($validated['pricing'] as $network => $amount) {
+
+        if ($amount === null || $amount === '') {
+            continue;
+        }
+
+        ClientSmsPricing::updateOrCreate(
+            [
+                'client_id' => $client->id,
+                'network' => $network,
+            ],
+            [
+                'amount' => $amount,
+            ]
+        );
+    }
+
+    return back()->with(
+        'success',
+        'SMS pricing updated successfully.'
+    );
+}
 }

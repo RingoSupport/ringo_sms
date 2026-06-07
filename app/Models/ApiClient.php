@@ -5,6 +5,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class ApiClient extends Authenticatable
 {
     protected $table = 'api_clients';
@@ -17,6 +18,10 @@ class ApiClient extends Authenticatable
         'email',
         'phone',
         'company_name',
+        'webhook_url',
+        'webhook_enabled',
+        
+
     ];
 
     protected $hidden = [
@@ -36,4 +41,12 @@ class ApiClient extends Authenticatable
         {
             return $this->hasMany(Message::class, 'client_id');
         }
+
+        public function smsPricing(): HasMany
+{
+    return $this->hasMany(
+        ClientSmsPricing::class,
+        'client_id'
+    );
+}
 }
