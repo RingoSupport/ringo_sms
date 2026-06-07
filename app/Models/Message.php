@@ -40,6 +40,7 @@ public function __construct(array $attributes = [])
         'vendor',
         'cost',
         'meta',
+        'webhook_sent_at',
     ];
 
     protected $casts = [
