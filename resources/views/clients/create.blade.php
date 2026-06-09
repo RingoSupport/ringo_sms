@@ -32,7 +32,7 @@
     </div>
 
     <p class="mt-1 text-sm text-amber-700">
-        A secure API password will be generated during client creation and displayed once after onboarding.
+       Secure API and Portal passwords will be generated during client creation and displayed once after onboarding.
     </p>
 
 </div>

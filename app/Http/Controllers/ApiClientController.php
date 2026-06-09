@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Validation\Rule;
+//use Illuminate\Validation\Rule;
 use App\Models\Wallet;
 use App\Models\ClientSmsPricing;
 //use App\Support\Audit;
@@ -81,7 +81,8 @@ public function store(Request $request): RedirectResponse
 
 
 
-    $plainPassword = Str::password(12);
+  $apiPassword = Str::password(12);
+$portalPassword = Str::password(12);
 
     DB::beginTransaction();
 
@@ -91,7 +92,8 @@ public function store(Request $request): RedirectResponse
             'client_name' => $validated['client_name'],
             'username'    => $validated['username'],
             'status'      => $validated['status'],
-            'password'    => Hash::make($plainPassword),
+            'password'    => Hash::make($apiPassword),
+            'portal_password' => Hash::make($portalPassword),
             'webhook_url' => $validated['webhook_url'] ?? null,
             'webhook_enabled' => $validated['webhook_enabled'] ?? false,
         ]);
@@ -114,10 +116,14 @@ public function store(Request $request): RedirectResponse
 
     }
 
-    return redirect()
-        ->route('clients.show', $client)
-        ->with('success', 'Client created successfully.')
-        ->with('generated_password', $plainPassword);
+ return redirect()
+    ->route('clients.show', $client)
+    ->with('success', 'Client created successfully.')
+    ->with('credentials', [
+        'username' => $client->username,
+        'api_password' => $apiPassword,
+        'portal_password' => $portalPassword,
+    ]);
 }
 
 public function updateStatus(ApiClient $client): RedirectResponse

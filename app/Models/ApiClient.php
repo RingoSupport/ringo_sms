@@ -14,13 +14,14 @@ class ApiClient extends Authenticatable
         'client_name',
         'username',
         'password',
+        'portal_password',
         'status',
         'email',
         'phone',
         'company_name',
         'webhook_url',
         'webhook_enabled',
-        
+
 
     ];
 

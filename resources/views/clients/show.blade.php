@@ -65,6 +65,94 @@
 
             </x-ui.page-header>
 
+      @if(session('credentials'))
+
+<x-ui.card>
+
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-5">
+
+        <div>
+
+            <h3 class="text-lg font-semibold text-amber-900">
+                Client Credentials Generated
+            </h3>
+
+            <p class="mt-1 text-sm text-amber-700">
+                Copy these credentials now.
+            </p>
+
+            <p class="mt-2 text-sm font-semibold text-rose-700">
+                ⚠ Passwords are stored securely and cannot be viewed again after this page is refreshed.
+            </p>
+
+        </div>
+
+        <div class="mt-6">
+
+            <div class="mb-6">
+
+                <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    Username
+                </div>
+
+                <div class="mt-1 font-mono text-sm text-slate-900">
+                    {{ session('credentials.username') }}
+                </div>
+
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+
+                <div>
+
+                    <h4 class="mb-3 font-medium text-slate-900">
+                        API Credentials
+                    </h4>
+
+                    <div>
+
+                        <div class="text-xs text-slate-500">
+                            API Password
+                        </div>
+
+                        <div class="mt-1 font-mono text-sm text-slate-900">
+                            {{ session('credentials.api_password') }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <h4 class="mb-3 font-medium text-slate-900">
+                        Portal Credentials
+                    </h4>
+
+                    <div>
+
+                        <div class="text-xs text-slate-500">
+                            Portal Password
+                        </div>
+
+                        <div class="mt-1 font-mono text-sm text-slate-900">
+                            {{ session('credentials.portal_password') }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</x-ui.card>
+
+@endif
+
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
                 {{-- Left column: Client Info --}}

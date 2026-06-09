@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\ApiClient;
+use Illuminate\Support\Facades\Hash;
 
 class ClientAuthenticatedSessionController extends Controller
 {
@@ -15,24 +17,38 @@ class ClientAuthenticatedSessionController extends Controller
         return view('client-auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ]);
+ public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'username' => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ]);
 
-        if (! Auth::guard('client')->attempt($credentials)) {
+    $username = $request->input('username');
+    $password = $request->input('password');
 
-            return back()->withErrors([
+    $client = ApiClient::query()
+        ->where('username', $username)
+        ->where('status', 'active')
+        ->first();
+
+    if (
+        ! $client ||
+        ! Hash::check($password, $client->portal_password)
+    ) {
+        return back()
+            ->withErrors([
                 'username' => 'Invalid credentials.',
-            ])->onlyInput('username');
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->route('client.dashboard');
+            ])
+            ->onlyInput('username');
     }
+
+    Auth::guard('client')->login($client);
+
+    $request->session()->regenerate();
+
+    return redirect()->route('client.dashboard');
+}
 
     public function destroy(Request $request): RedirectResponse
     {
