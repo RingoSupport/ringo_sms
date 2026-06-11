@@ -7,7 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WalletHistory extends Model
 {
-    protected $table = 'wallet_history';
+   protected $table;
+
+public function __construct(array $attributes = [])
+{
+    parent::__construct($attributes);
+
+    $this->table = config(
+        'sms.tables.wallet_history',
+        'wallet_history'
+    );
+}
 
     public $updated_at = false;
 

@@ -16,18 +16,34 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-  use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles;
 
+    protected $table;
 
-    protected $fillable = ['name', 'email', 'password', 'client_id', 'role', 'status'];
-    protected $hidden = ['password', 'remember_token'];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+        $this->table = config(
+            'sms.tables.users',
+            'users'
+        );
+    }
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'client_id',
+        'role',
+        'status',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -37,17 +53,17 @@ class User extends Authenticatable
     }
 
     public function isSuperAdmin(): bool
-{
-    return $this->role === 'super_admin';
-}
+    {
+        return $this->role === 'super_admin';
+    }
 
-public function isOperations(): bool
-{
-    return $this->role === 'operations';
-}
+    public function isOperations(): bool
+    {
+        return $this->role === 'operations';
+    }
 
-public function isClient(): bool
-{
-    return $this->role === 'client';
-}
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
+    }
 }

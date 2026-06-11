@@ -10,6 +10,19 @@ class LoginOtp extends Model
 {
     //
 
+    protected $table;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->table = config(
+            'sms.tables.login_otps',
+            'login_otps'
+        );
+    }
+
+
     protected $fillable = [
         'user_id',
         'otp',

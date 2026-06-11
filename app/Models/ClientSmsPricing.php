@@ -7,7 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ClientSmsPricing extends Model
 {
-    protected $table = 'client_sms_pricing';
+    protected $table;
+
+public function __construct(array $attributes = [])
+{
+    parent::__construct($attributes);
+
+    $this->table = config(
+        'sms.tables.client_sms_pricing',
+        'client_sms_pricing'
+    );
+}
 
     protected $fillable = [
         'client_id',

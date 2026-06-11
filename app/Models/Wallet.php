@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wallet extends Model
 {
+
+protected $table;
+
+public function __construct(array $attributes = [])
+{
+    parent::__construct($attributes);
+
+    $this->table = config(
+        'sms.tables.wallets',
+        'wallets'
+    );
+}
     protected $fillable = [
         'client_id',
         'balance',

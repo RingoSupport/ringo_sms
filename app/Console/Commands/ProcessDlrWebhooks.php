@@ -88,7 +88,7 @@ public function handle(): int
                 "Skipping non-final status {$dlr->status} for Message {$dlr->message_id}"
             );
 
-            DB::table('mobi_dlr')
+            DB::table('ringo_dlr')
                 ->where('id', $dlr->id)
                 ->delete();
 

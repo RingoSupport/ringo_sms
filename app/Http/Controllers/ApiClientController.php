@@ -163,7 +163,10 @@ public function fundWallet(Request $request, ApiClient $client): RedirectRespons
 
         $wallet->increment('balance', $amount);
 
-        DB::table('wallet_history')->insert([
+        DB::table( config(
+        'sms.tables.wallet_history',
+        'wallet_history'
+    ))->insert([
 
             'wallet_id' => $wallet->id,
 
