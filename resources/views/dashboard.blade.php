@@ -4,7 +4,7 @@
 
       <x-ui.page-header
     title="Dashboard"
-    description="Welcome to the MobifinSms Operations Portal."
+    description="Welcome to the Ringo SMS Operations Portal."
 />
 
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
