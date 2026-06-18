@@ -25,7 +25,7 @@
         <div class="mb-6 text-center">
 
             <div class="text-3xl font-bold text-slate-900">
-                Mobifin SMS Portal
+                Ringo SMS Portals
             </div>
 
             <p class="mt-2 text-sm text-slate-600">
