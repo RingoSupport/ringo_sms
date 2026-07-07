@@ -127,6 +127,8 @@
 
             </x-ui.table>
 
+      
+
           @if(method_exists($walletHistory, 'links'))
 
                 <div class="mt-4">
